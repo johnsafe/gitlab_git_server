@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+require_relative "../lib/befor_start_operate"
+require "gitlab_git_server"
+
+if ARGV.join.match('-p')
+  p = ARGV.join.match(/-p\s*([^\s]+)/)
+  if (p && p[1])
+    ENV['CONFIG_FILE'] = p[1]
+    puts
+    puts "=> Start server using port #{p[1]}"
+    Gitlab::Git::Server.start(p[1])
+  else
+    puts
+    puts "Please start with port num."
+  end
+else
+  puts "=> Start server using port 9000 as default"
+  Gitlab::Git::Server.start(9000)
+end
+

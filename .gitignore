@@ -1,0 +1,14 @@
+support/*
+tmp/*
+coverage/*
+.DS_Store
+server_call_log.log
+config.yml
+.bundle
+pids/*
+logs/*
+vendor/cache/extensions/
+vendor/cache/gitlab_git*
+vendor/cache/rugged*
+dump.rdb
+.idea/*

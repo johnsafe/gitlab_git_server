@@ -1,0 +1,4 @@
+v 0.0.0
+  - a new gem base on csdn`s gitlab_git_server
+v 1.0.0
+  - first public full feature gitlab_git_server

@@ -1,0 +1,54 @@
+#!/usr/bin/env ruby
+#encoding: utf-8
+require 'yaml'
+require 'fileutils'
+
+# worker项目根路径
+root_path = File.dirname File.dirname(File.realpath(__FILE__))
+# 读取配置文件
+config_path =  File.join(root_path, '..', 'config.yml')
+config_path =  File.join(root_path, 'config.yml') unless File.exist?(config_path)
+config = YAML.load File.open(config_path)
+
+# 环境变量
+env = ENV['ENV'] ? ENV['ENV'] : 'production'
+
+# 日志文件
+log_file = File.join(config['log_dir'], 'gitlab-git-sidekiq-server.log')
+# sidekiq pid文件路径
+pidfile  = File.join(config['pid_dir'], 'gitlab-git-sidekiq-server.pid')
+# 检查tmp目录和log目录是否存在，不存在则创建
+[File.dirname(log_file), File.dirname(pidfile)].each do |dir|
+   FileUtils.mkdir_p dir, mode: 0776 unless File.exist? dir
+end
+
+# redis config
+local_sidekiq_redis = config['redis']['local_sidekiq_redis']
+redis_url = if local_sidekiq_redis['password'].nil?
+              "redis://#{local_sidekiq_redis['host']}:#{local_sidekiq_redis['port']}/#{local_sidekiq_redis['db']}"
+            else
+              "redis://:#{local_sidekiq_redis['password']}@#{local_sidekiq_redis['host']}:#{local_sidekiq_redis['port']}/#{local_sidekiq_redis['db']}"
+            end
+p redis_url
+
+action = ARGV.first.to_s.strip
+action = 'start' unless ['start', 'stop'].include? action
+case action
+when 'start'
+  if File.exist? pidfile
+    pid = File.open(pidfile, 'r').read
+    if File.exist?("/proc/#{pid}")
+      puts 'sidekiq already started.'
+      exit
+    end
+  end
+
+  cmd = "RACK_ENV=#{env} REDIS_URL=#{redis_url} bundle exec sidekiq -r ./lib/gitlab_git_server.rb -c #{config['gitlab_git_server_sidekiq']['thread_count']} -q #{config['gitlab_git_server_sidekiq']['queue_names']} -P #{pidfile} -L #{log_file} -d"
+  # puts cmd 
+  result = system cmd
+  print 'sidekiq start ', result ? 'success' : 'fail', "\n"
+when 'stop'
+   result = system "bundle exec sidekiqctl stop #{pidfile}"
+   print 'sidekiq stop ', result ? 'success' : 'fail', "\n"
+end
+

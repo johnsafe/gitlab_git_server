@@ -1,0 +1,95 @@
+# reids
+redis:
+  route_redis:
+    host: 127.0.0.1
+    port: 6379
+    db:   0
+    password:  # password for redis
+
+  front_cache_redis:
+    host: 127.0.0.1
+    port: 6379
+    db:   0
+    password:  # password for redis
+
+  local_cache_redis:
+    host: 127.0.0.1
+    port: 6379
+    db:   0
+    password:  # password for redis
+
+  local_sidekiq_redis:
+    host: 127.0.0.1
+    port: 6379
+    db:   2
+    password:  # password for redis
+
+  #project sync redis
+  sync_worker_redis:
+    host: 127.0.0.1
+    port: 6379
+    db: 0
+    password:  # password for redis
+    namespace: prj_sync
+
+# git repository path
+repository:
+  pre_path: /home/git/repositories/
+
+# git repository hooks dir
+git_hooks_dir: /home/git/Code_BE/hooks
+
+# gitlab_git_server server start host
+hostname: myhostname
+
+# log dir
+log_dir: /home/git/Code_BE/gitlab_git_server/logs
+
+# pid dir
+pid_dir: /home/git/Code_BE/gitlab_git_server/pids
+
+# sidekiq config
+gitlab_git_server_sidekiq:
+  thread_count: 5
+  namespace: import
+  queue_names: default
+
+# gitlab_git_server config
+merge_repo:
+  default_cache_num: 300
+  default_patch_path: /home/git/merge_request_patches/
+  diff_commit_cache_default_time: 302400 #60*60*12*7
+
+# drb obj cache time
+drb:
+  timeout: 5
+  request_wait_timeout: 60
+
+# svn clone tmp dir
+temp_svn_path: /home/git/temp_svn_repos
+
+# blob size limit
+blob:
+  data_size_limit: 52428800 #50*1024*1024
+  data_line_limit: 10000
+  binary_size_limit: 52428800 #50*1024*1024
+
+multiple_center:
+  redis_host: 127.0.0.1
+  redis_port: 6379
+  redis_db: 0
+  redis_pwd: 
+  current: SZ # 当前数据中心简称
+  DCdomain:
+    BJ: 'bj.isource.com' # 北京数据中心
+    SZ: 'sz.isource.com' # 深圳数据中心
+    SH: 'sh.isource.com' # 上海数据中心
+
+backend:
+  default_host: 'backend'
+  ssh_port: 22
+  repo_hosts: ['backend']
+  slave_counts: 0 
+
+#导入或派生项目超时设置8小时，单位秒
+git_fork_timeout: 28800   #8*60*60
